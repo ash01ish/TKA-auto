@@ -76,9 +76,9 @@ module "eks" {
 
 resource "kubernetes_deployment" "app" {
   metadata {
-    name = ${local.app}
+    name = "${local.app}"
     labels = {
-      app = ${local.app}
+      app = "${local.app}"
     }
   }
   spec {
@@ -86,19 +86,19 @@ resource "kubernetes_deployment" "app" {
 
     selector {
       match_labels = {
-        app = ${local.app}
+        app = "${local.app}"
       }
     }
     template {
       metadata {
         labels = {
-          app = ${local.app}
+          app = "${local.app}"
         }
       }
       spec {
         container {
-          image = ${local.docker-image}
-          name  = ${local.app}
+          image = "${local.docker-image}"
+          name  = "${local.app}"
           port {
             name           = "port-5000"
             container_port = 5000
