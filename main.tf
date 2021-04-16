@@ -3,6 +3,7 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+
 data "aws_eks_cluster" "cluster" {
   name = module.eks.cluster_id
 }
@@ -22,6 +23,8 @@ data "aws_availability_zones" "available" {
 
 locals {
   cluster_name = "my-cluster"
+  docker-image = "password_generator:latest"
+  app = "password-generator"
 }
 
 module "vpc" {
@@ -69,4 +72,39 @@ module "eks" {
 
   write_kubeconfig   = true
   config_output_path = "./"
+}
+
+resource "kubernetes_deployment" "app" {
+  metadata {
+    name = ${local.app}
+    labels = {
+      app = ${local.app}
+    }
+  }
+  spec {
+    replicas = 3
+
+    selector {
+      match_labels = {
+        app = ${local.app}
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = ${local.app}
+        }
+      }
+      spec {
+        container {
+          image = ${local.docker-image}
+          name  = ${local.app}
+          port {
+            name           = "port-5000"
+            container_port = 5000
+          }
+        }
+      }
+    }
+  }
 }
